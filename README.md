@@ -62,45 +62,38 @@ simulator (simulators can usually also reach `localhost` directly, but the LAN I
 ## Architecture
 
 ```mermaid
-flowchart LR
-    subgraph Client["📱 Expo app (React Native)"]
-        A["Take / pick a photo"]
-        H["Review screen<br/>confirm · edit · discard"]
-        L["Library list"]
-    end
+%%{init: {"themeVariables": {"fontSize": "20px"}, "flowchart": {"nodeSpacing": 45, "rankSpacing": 65}}}%%
+flowchart TD
+    A["Take / pick a photo<br/>Expo app"]:::client
+    B["POST /api/scan<br/>Django"]:::backend
+    C["FastSAM<br/>segment individual spines<br/>local · CPU · off-the-shelf"]:::local
+    D["Claude Haiku<br/>1 batched call reads every crop<br/>hosted · Anthropic API"]:::hosted
+    E["rapidfuzz matching<br/>vs catalog.csv, 114 entries"]:::backend
+    F{"confidence"}:::backend
+    G["POST /api/library<br/>auto-add or confirm"]:::backend
+    Rv["Review screen<br/>confirm · edit · discard<br/>Expo app"]:::client
+    X["not persisted"]:::muted
+    DB[("SQLite<br/>LibraryEntry")]:::backend
+    L["Library list<br/>Expo app"]:::client
 
-    subgraph Backend["Django REST API"]
-        B["POST /api/scan"]
-        E["rapidfuzz matching<br/>vs catalog.csv (114 entries)"]
-        F{"confidence"}
-        G["POST /api/library<br/>(auto-add or confirm)"]
-        DB[("SQLite<br/>LibraryEntry")]
-    end
+    A -->|multipart photo| B --> C -->|spine crops| D -->|title / author per spine| E --> F
+    F -->|high confidence| G
+    F -->|low confidence / unmatched| Rv
+    Rv -->|confirm| G
+    Rv -->|discard| X
+    G --> DB --> L
 
-    subgraph Local["Local · CPU · off-the-shelf, no training"]
-        C["FastSAM<br/>segment individual spines"]
-    end
-
-    subgraph Hosted["Hosted · Anthropic API"]
-        D["Claude Haiku<br/>1 batched call reads every crop"]
-    end
-
-    A -->|multipart photo| B
-    B --> C
-    C -->|spine crops| D
-    D -->|title / author per spine| E
-    E --> F
-    F -->|high confidence| G --> DB
-    F -->|low confidence / unmatched| H
-    H -->|confirm| G
-    H -->|discard| X["not persisted"]
-    DB --> L
+    classDef client fill:#dde4ec,stroke:#274060,color:#1b1f1a,stroke-width:2px
+    classDef backend fill:#f1e3cd,stroke:#a06a1e,color:#1b1f1a,stroke-width:2px
+    classDef local fill:#dcece2,stroke:#34694b,color:#1b1f1a,stroke-width:2px
+    classDef hosted fill:#f2ddda,stroke:#9c3b34,color:#1b1f1a,stroke-width:2px
+    classDef muted fill:#eeeeee,stroke:#999999,color:#555555
 ```
 
-Solid arrows are the request/response path for a single scan; the diagram's real point is the
-**Local** vs. **Hosted** split -- geometry stays on the machine, reading text is the only step that
-leaves it, and nothing reaches `LibraryEntry` without either clearing the confidence bar or a human
-tapping Confirm.
+Color marks where each step actually runs -- blue is the Expo app, tan is Django, **green is the
+one local/CPU step, red is the one hosted API call**. Geometry stays on the machine; reading text is
+the only step that leaves it. Nothing reaches `LibraryEntry` (bottom) without either clearing the
+confidence bar or a human tapping Confirm.
 
 **Local vs. hosted, and why**: FastSAM (Ultralytics, off-the-shelf pretrained weights, no
 training/fine-tuning) runs locally on CPU and does pure geometry -- finding *where* spines are.
