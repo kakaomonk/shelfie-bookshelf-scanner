@@ -1,26 +1,13 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { ApiError, resolveMediaUrl, scanPhoto } from '../api';
+import { ApiError, scanPhoto } from '../api';
+import AutoAddedItem from '../components/AutoAddedItem';
+import ReviewItem from '../components/ReviewItem';
 import { ScanResponse } from '../types';
 
 type Stage = 'idle' | 'uploading' | 'done' | 'error';
-
-const MATCH_LABEL: Record<string, string> = {
-  matched: 'Added to library',
-  review: 'Needs review',
-  unmatched: 'Not in catalog',
-};
 
 export default function ScanScreen() {
   const [stage, setStage] = useState<Stage>('idle');
@@ -73,6 +60,9 @@ export default function ScanScreen() {
     setErrorMessage(null);
   }
 
+  const autoAdded = result?.books.filter((b) => b.match.status === 'matched') ?? [];
+  const needsReview = result?.books.filter((b) => b.match.status !== 'matched') ?? [];
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.heading}>Scan a bookshelf</Text>
@@ -118,21 +108,23 @@ export default function ScanScreen() {
 
           {result.books.length === 0 && <Text style={styles.statusText}>No books found in this photo.</Text>}
 
-          {result.books.map((book) => {
-            const cropUrl = resolveMediaUrl(book.crop_url);
-            return (
-              <View key={book.index} style={styles.bookRow}>
-                {cropUrl && <Image source={{ uri: cropUrl }} style={styles.thumbnail} />}
-                <View style={styles.bookInfo}>
-                  <Text style={styles.bookTitle}>
-                    {book.match.best_match?.title || book.read.title || '(unreadable spine)'}
-                  </Text>
-                  <Text style={styles.bookAuthor}>{book.match.best_match?.author || book.read.author}</Text>
-                  <Text style={styles.bookStatus}>{MATCH_LABEL[book.match.status]}</Text>
-                </View>
-              </View>
-            );
-          })}
+          {autoAdded.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Added automatically ({autoAdded.length})</Text>
+              {autoAdded.map((book) => (
+                <AutoAddedItem key={book.index} book={book} />
+              ))}
+            </View>
+          )}
+
+          {needsReview.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Needs your review ({needsReview.length})</Text>
+              {needsReview.map((book) => (
+                <ReviewItem key={book.index} book={book} />
+              ))}
+            </View>
+          )}
 
           <TouchableOpacity style={styles.button} onPress={reset}>
             <Text style={styles.buttonText}>Scan Another</Text>
@@ -156,10 +148,6 @@ const styles = StyleSheet.create({
   errorText: { fontSize: 15, color: '#b00020', textAlign: 'center' },
   results: { gap: 10, marginTop: 8 },
   warning: { color: '#8a6d00', backgroundColor: '#fff4d6', padding: 10, borderRadius: 8 },
-  bookRow: { flexDirection: 'row', gap: 12, alignItems: 'center', paddingVertical: 6 },
-  thumbnail: { width: 48, height: 72, borderRadius: 4, backgroundColor: '#eee' },
-  bookInfo: { flex: 1 },
-  bookTitle: { fontSize: 16, fontWeight: '600' },
-  bookAuthor: { fontSize: 14, color: '#555' },
-  bookStatus: { fontSize: 12, color: '#2f6690', marginTop: 2 },
+  section: { gap: 10, marginTop: 8 },
+  sectionTitle: { fontSize: 15, fontWeight: '700', color: '#333' },
 });
