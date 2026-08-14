@@ -146,10 +146,26 @@ cluttered shelf photo, 3024×4032, 22 detected spine candidates) on an Apple Sil
 
 | Stage | Time | Notes |
 |---|---|---|
-| Spine detection (cold, incl. model load) | ~6.6s | Once per backend process |
-| Spine detection (warm) | ~4.3s | Every scan after the first in a given process |
-| VLM read (Claude Haiku, 22 crops, 1 batched call) | _pending_ | Needs a live Anthropic API key -- see below |
-| Est. cost per photo | _pending_ | `= input_tokens/1e6 * $1.00 + output_tokens/1e6 * $5.00` (Haiku 4.5 published pricing) once measured |
+| Spine detection (cold, incl. model load) | ~6.0s | Once per backend process |
+| Spine detection (warm) | ~2.4-4.3s | Every scan after the first in a given process; varies with system load |
+| VLM read (Claude Haiku, 22 crops, 1 batched call) | ~8.5-10.6s | One network round trip regardless of spine count (up to the 30-crop cap) |
+| Tokens per photo | ~12,900 in / ~800-820 out | 22 images + prompt in, one structured tool-call out |
+| Est. cost per photo | **~$0.017** | `12,900/1e6 * $1.00 + 810/1e6 * $5.00`, Haiku 4.5's published per-token rate |
+
+The VLM call was measured through OpenRouter's Anthropic-compatible passthrough (`ANTHROPIC_BASE_URL`,
+see `.env.example`) rather than `api.anthropic.com` directly -- a direct Anthropic key wasn't
+available yet at measurement time. The dollar figure above applies Anthropic's own published Haiku
+rate to the actual token counts OpenRouter reported, so it's the real expected cost on the direct
+path the README otherwise describes, not an OpenRouter-specific number; latency against
+`api.anthropic.com` directly would likely be a little lower (one less network hop).
+
+On this real photo (not a clean staged shot -- a shelf with a massage-gun box and several
+non-catalog books mixed in), the VLM legibly read 7 of 22 candidates; the other 15 were correctly
+recognized as untrustworthy or off (see "Known limitations" -- most were furniture, not spines).
+All 7 legible reads correctly landed as `unmatched` rather than false-matching to something in the
+114-book catalog (none of these specific books are in it) -- exactly the outcome that should
+happen: the matcher didn't force a confident-looking wrong answer just because *something* scored
+highest.
 
 The VLM row is the one number this README can't honestly fill in yet: a working `ANTHROPIC_API_KEY`
 wasn't available at the time of the last update. `scripts/measure_pipeline.py` already computes
@@ -230,9 +246,10 @@ point, bibliographic precision isn't.
   anything in the catalog and lands in the review queue for a one-tap discard, so it degrades the
   review experience rather than the data quality -- but with more time, a cheap next step would be
   constraining candidates to a detected shelf-surface band instead of the whole frame.
-- **VLM latency/cost aren't measured yet** (see "Measured latency & cost" above) -- blocked on a
-  working API key, not on the code; `scripts/measure_pipeline.py` is ready to produce these numbers
-  the moment one's available, and this section will be updated before submission.
+- **VLM numbers were measured through an OpenRouter passthrough, not `api.anthropic.com`
+  directly** (see "Measured latency & cost" above) -- a direct Anthropic key wasn't available yet
+  when this was measured. Same model, same token accounting, likely marginally lower latency on
+  the direct path; will re-measure directly if a key arrives before submission.
 - **No re-matching after a manual correction** in the review screen, as noted above.
 - **The 30-spines-per-call cap isn't chunked into follow-up calls** for denser shelves -- it's
   surfaced as a warning instead, which is honest but not a full solution.

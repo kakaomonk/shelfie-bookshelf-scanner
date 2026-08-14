@@ -28,3 +28,10 @@ frontend/android/
 # Local AI coding tool config (not part of the app)
 .claude/
 frontend/.claude/
+CLAUDE.md
+
+# Debug artifacts (annotated detection visualizations, etc.) -- not a deliverable
+debug_output/
+
+# Interview prep material (Artifact source) -- not part of the submitted repo
+interview_notes/

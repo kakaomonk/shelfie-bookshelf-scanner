@@ -34,6 +34,11 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+# Dev-only escape hatch: lets scanner/vlm.py be pointed at an Anthropic-compatible passthrough
+# (e.g. OpenRouter's "Anthropic Skin") while waiting on a direct Anthropic key. Unset in normal
+# use -- the app talks to api.anthropic.com directly, as the README describes.
+ANTHROPIC_BASE_URL = os.environ.get('ANTHROPIC_BASE_URL') or None
+ANTHROPIC_MODEL = os.environ.get('ANTHROPIC_MODEL') or 'claude-haiku-4-5-20251001'
 
 
 # Application definition

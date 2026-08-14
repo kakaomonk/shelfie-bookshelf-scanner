@@ -26,7 +26,6 @@ from typing import List
 import anthropic
 from django.conf import settings
 
-MODEL = 'claude-haiku-4-5-20251001'
 MAX_SPINES_PER_CALL = 30
 REQUEST_TIMEOUT_SECONDS = 45.0
 
@@ -128,12 +127,15 @@ def read_spines(crops: list):
         content.append(_encode_image(crop))
     content.append({'type': 'text', 'text': INSTRUCTIONS})
 
-    client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=REQUEST_TIMEOUT_SECONDS)
+    client_kwargs = {'api_key': settings.ANTHROPIC_API_KEY, 'timeout': REQUEST_TIMEOUT_SECONDS}
+    if settings.ANTHROPIC_BASE_URL:
+        client_kwargs['base_url'] = settings.ANTHROPIC_BASE_URL
+    client = anthropic.Anthropic(**client_kwargs)
 
     start = time.monotonic()
     try:
         response = client.messages.create(
-            model=MODEL,
+            model=settings.ANTHROPIC_MODEL,
             max_tokens=2048,
             tools=[TOOL_SCHEMA],
             tool_choice={'type': 'tool', 'name': 'report_spine_reads'},
