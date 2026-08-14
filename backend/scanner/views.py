@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from .detection import detect_spines
 from .matching import match_book
 from .models import CatalogBook, LibraryEntry
-from .vlm import read_spines
+from .vlm import SpineRead, read_spines
 
 
 @api_view(['GET'])
@@ -50,13 +50,23 @@ def library(request):
     catalog_book = None
     catalog_id = request.data.get('catalog_id')
     if catalog_id:
-        catalog_book = CatalogBook.objects.filter(id=catalog_id).first()
+        try:
+            catalog_book = CatalogBook.objects.filter(id=int(catalog_id)).first()
+        except (TypeError, ValueError):
+            return Response({'error': 'catalog_id must be an integer.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    match_confidence = request.data.get('match_confidence')
+    if match_confidence is not None:
+        try:
+            match_confidence = float(match_confidence)
+        except (TypeError, ValueError):
+            return Response({'error': 'match_confidence must be a number.'}, status=status.HTTP_400_BAD_REQUEST)
 
     entry = LibraryEntry.objects.create(
         title=title,
         author=author,
         catalog_book=catalog_book,
-        match_confidence=request.data.get('match_confidence'),
+        match_confidence=match_confidence,
     )
     return Response(_serialize_library_entry(entry), status=status.HTTP_201_CREATED)
 
@@ -150,7 +160,11 @@ def scan(request):
             crop_urls.append(None)
 
     t1 = time.monotonic()
-    reads, vlm_meta = read_spines([spine.crop for spine in spines])
+    try:
+        reads, vlm_meta = read_spines([spine.crop for spine in spines])
+    except Exception as exc:  # read_spines already catches API/parse errors; this is a last resort
+        reads = [SpineRead(i, '', '', False) for i in range(len(spines))]
+        vlm_meta = {'ok': False, 'error': f'{type(exc).__name__}: {exc}'}
     vlm_seconds = time.monotonic() - t1
 
     if not vlm_meta.get('ok', True):
