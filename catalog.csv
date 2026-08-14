@@ -1,0 +1,115 @@
+id,title,author,alt_titles,year,publisher
+1,Dune,Frank Herbert,,1965,Chilton Books
+2,Dune,Frank Herbert,,2019,Ace (movie tie-in edition)
+3,Dune Messiah,Frank Herbert,,1969,G.P. Putnam's Sons
+4,Children of Dune,Frank Herbert,,1976,G.P. Putnam's Sons
+5,1984,George Orwell,Nineteen Eighty-Four,1949,Secker & Warburg
+6,1984,George Orwell,Nineteen Eighty-Four,1961,Signet Classics
+7,The Hobbit,J.R.R. Tolkien,"The Hobbit, or There and Back Again",1937,Allen & Unwin
+8,The Hobbit,J.R.R. Tolkien,"The Hobbit, or There and Back Again",2012,Houghton Mifflin
+9,The Lord of the Rings,J.R.R. Tolkien,LOTR,1968,Allen & Unwin (single-volume omnibus)
+10,The Fellowship of the Ring,J.R.R. Tolkien,,1954,Allen & Unwin
+11,The Two Towers,J.R.R. Tolkien,,1954,Allen & Unwin
+12,The Return of the King,J.R.R. Tolkien,,1955,Allen & Unwin
+13,The Chronicles of Narnia,C.S. Lewis,Narnia Omnibus,2001,"HarperCollins (single-volume omnibus, 7 books)"
+14,"The Lion, the Witch and the Wardrobe",C.S. Lewis,,1950,Geoffrey Bles
+15,Prince Caspian,C.S. Lewis,,1951,Geoffrey Bles
+16,Harry Potter and the Philosopher's Stone,J.K. Rowling,,1997,Bloomsbury
+17,Harry Potter and the Sorcerer's Stone,J.K. Rowling,,1998,Scholastic
+18,Harry Potter and the Chamber of Secrets,J.K. Rowling,,1998,Bloomsbury
+19,Harry Potter and the Prisoner of Azkaban,J.K. Rowling,,1999,Bloomsbury
+20,Harry Potter and the Goblet of Fire,J.K. Rowling,,2000,Bloomsbury
+21,Harry Potter and the Order of the Phoenix,J.K. Rowling,,2003,Bloomsbury
+22,Harry Potter and the Half-Blood Prince,J.K. Rowling,,2005,Bloomsbury
+23,Harry Potter and the Deathly Hallows,J.K. Rowling,,2007,Bloomsbury
+24,The Cuckoo's Calling,Robert Galbraith,,2013,Mulholland Books
+25,The Golden Compass,Philip Pullman,Northern Lights,1995,Knopf (US) / Scholastic (UK: Northern Lights)
+26,Foundation,Isaac Asimov,,1951,Gnome Press
+27,Foundation and Empire,Isaac Asimov,,1952,Gnome Press
+28,Second Foundation,Isaac Asimov,,1953,Gnome Press
+29,Foundation,Peter Ackroyd,"The History of England, Volume I",2011,Macmillan
+30,The Stranger,Albert Camus,L'Étranger,1942,Gallimard
+31,The Stranger,Harlan Coben,,2015,Dutton
+32,It,Stephen King,,1986,Viking
+33,It Ends with Us,Colleen Hoover,,2016,Atria Books
+34,The Shining,"King, Stephen",,1977,Doubleday
+35,One Hundred Years of Solitude,"García Márquez, Gabriel",Cien años de soledad,1967,Harper & Row
+36,Love in the Time of Cholera,Gabriel Garcia Marquez,El amor en los tiempos del cólera,1985,Knopf
+37,Crime and Punishment,Fyodor Dostoevsky,,1866,The Russian Messenger
+38,The Brothers Karamazov,"Dostoyevsky, Fyodor M.",,1880,The Russian Messenger
+39,War and Peace,Leo Tolstoy,,1869,The Russian Messenger
+40,Anna Karenina,"Tolstoy, Leo",,1877,The Russian Messenger
+41,To Kill a Mockingbird,Harper Lee,,1960,J.B. Lippincott & Co.
+42,The Great Gatsby,F. Scott Fitzgerald,,1925,Charles Scribner's Sons
+43,Pride and Prejudice,Jane Austen,,1813,T. Egerton
+44,Beloved,Toni Morrison,,1987,Knopf
+45,The Catcher in the Rye,J.D. Salinger,,1951,"Little, Brown and Company"
+46,Slaughterhouse-Five,Kurt Vonnegut,,1969,Delacorte Press
+47,The Bell Jar,Sylvia Plath,,1963,Heinemann
+48,Middlemarch,George Eliot,,1871,William Blackwood and Sons
+49,Jane Eyre,Charlotte Bronte,,1847,"Smith, Elder & Co."
+50,Wuthering Heights,Emily Bronte,,1847,Thomas Cautley Newby
+51,Moby-Dick,Herman Melville,,1851,Harper & Brothers
+52,The Grapes of Wrath,John Steinbeck,,1939,The Viking Press
+53,Of Mice and Men,John Steinbeck,,1937,Covici Friede
+54,Don Quixote,Miguel de Cervantes,,1605,Francisco de Robles
+55,The Alchemist,Paulo Coelho,O Alquimista,1988,HarperTorch
+56,Where the Crawdads Sing,Delia Owens,,2018,G.P. Putnam's Sons
+57,The Kite Runner,Khaled Hosseini,,2003,Riverhead Books
+58,Life of Pi,Yann Martel,,2001,Knopf Canada
+59,The Road,Cormac McCarthy,,2006,Alfred A. Knopf
+60,No Country for Old Men,Cormac McCarthy,,2005,Alfred A. Knopf
+61,All the Light We Cannot See,Anthony Doerr,,2014,Scribner
+62,The Book Thief,Markus Zusak,,2005,Picador
+63,The Night Circus,Erin Morgenstern,,2011,Doubleday
+64,Normal People,Sally Rooney,,2018,Faber & Faber
+65,The Handmaid's Tale,Margaret Atwood,,1985,McClelland and Stewart
+66,Never Let Me Go,Kazuo Ishiguro,,2005,Faber & Faber
+67,The Remains of the Day,Kazuo Ishiguro,,1989,Faber & Faber
+68,Klara and the Sun,"Ishiguro, Kazuo",,2021,Faber & Faber
+69,Ender's Game,Orson Scott Card,,1985,Tor Books
+70,Neuromancer,William Gibson,,1984,Ace Books
+71,Brave New World,Aldous Huxley,,1932,Chatto & Windus
+72,Fahrenheit 451,Ray Bradbury,,1953,Ballantine Books
+73,The Martian,Andy Weir,,2011,Crown Publishing
+74,Project Hail Mary,Andy Weir,,2021,Ballantine Books
+75,A Game of Thrones,George R.R. Martin,,1996,Bantam Spectra
+76,A Clash of Kings,George R.R. Martin,,1998,Bantam Spectra
+77,Mistborn: The Final Empire,Brandon Sanderson,Mistborn,2006,Tor Books
+78,The Name of the Wind,Patrick Rothfuss,,2007,DAW Books
+79,American Gods,Neil Gaiman,,2001,William Morrow
+80,Good Omens,Neil Gaiman and Terry Pratchett,,1990,Victor Gollancz
+81,The Hitchhiker's Guide to the Galaxy,Douglas Adams,,1979,Pan Books
+82,Circe,Madeline Miller,,2018,"Little, Brown and Company"
+83,The Song of Achilles,Madeline Miller,,2011,Ecco
+84,Gone Girl,Gillian Flynn,,2012,Crown Publishing
+85,Sharp Objects,Gillian Flynn,,2006,Shaye Areheart Books
+86,The Girl with the Dragon Tattoo,Stieg Larsson,Man som hatar kvinnor,2005,Norstedts Forlag
+87,The Da Vinci Code,Dan Brown,,2003,Doubleday
+88,And Then There Were None,Agatha Christie,,1939,Collins Crime Club
+89,Murder on the Orient Express,Agatha Christie,,1934,Collins Crime Club
+90,The Silent Patient,Alex Michaelides,,2019,Celadon Books
+91,Big Little Lies,Liane Moriarty,,2014,Penguin
+92,The Girl on the Train,Paula Hawkins,,2015,Doubleday
+93,The Hunger Games,Suzanne Collins,,2008,Scholastic
+94,Catching Fire,Suzanne Collins,,2009,Scholastic
+95,Divergent,Veronica Roth,,2011,Katherine Tegen Books
+96,The Fault in Our Stars,John Green,,2012,Dutton Books
+97,Twilight,Stephenie Meyer,,2005,"Little, Brown and Company"
+98,Sapiens: A Brief History of Humankind,Yuval Noah Harari,,2011,Harvill Secker
+99,Atomic Habits,James Clear,,2018,Avery
+100,"Thinking, Fast and Slow",Daniel Kahneman,,2011,"Farrar, Straus and Giroux"
+101,The Lean Startup,Eric Ries,,2011,Crown Business
+102,Educated,Tara Westover,,2018,Random House
+103,Becoming,Michelle Obama,,2018,Crown Publishing
+104,Outliers,Malcolm Gladwell,,2008,"Little, Brown and Company"
+105,The Tipping Point,Malcolm Gladwell,,2000,"Little, Brown and Company"
+106,A Brief History of Time,Stephen Hawking,,1988,Bantam Books
+107,Cosmos,Carl Sagan,,1980,Random House
+108,The Selfish Gene,Richard Dawkins,,1976,Oxford University Press
+109,Man's Search for Meaning,Viktor E. Frankl,,1946,Verlag fur Jugend und Volk
+110,The Power of Habit,Charles Duhigg,,2012,Random House
+111,Freakonomics,Steven D. Levitt and Stephen J. Dubner,,2005,William Morrow
+112,Charlotte's Web,E.B. White,,1952,Harper & Brothers
+113,The Very Hungry Caterpillar,Eric Carle,,1969,World Publishing Company
+114,Where the Wild Things Are,Maurice Sendak,,1963,Harper & Row
