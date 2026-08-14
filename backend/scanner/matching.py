@@ -157,4 +157,12 @@ def match_book(read_title: str, read_author: Optional[str], catalog_books: Itera
     else:
         status = 'unmatched'
 
+    # 'unmatched' must mean "no usable suggestion", not "here's whichever catalog row happened to
+    # sort first." Without this, an illegible read (empty title AND author) scores exactly 0.0
+    # against every catalog row; Python's stable sort then keeps catalog order among the tie, so
+    # the lowest-id row -- Dune, id 1 -- silently won and got shown as a "suggested" match on every
+    # unreadable spine. Caught via a real device test where nearly everything came back as Dune.
+    if status == 'unmatched':
+        return {'status': status, 'best_match': None, 'candidates': []}
+
     return {'status': status, 'best_match': best, 'candidates': top}

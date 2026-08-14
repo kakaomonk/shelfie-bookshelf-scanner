@@ -34,6 +34,17 @@ class MatchingAgainstSyntheticCatalogTests(TestCase):
         result = match_book('Some Completely Unrelated Title', 'Nobody Real', self.catalog)
         self.assertEqual(result['status'], 'unmatched')
 
+    def test_unmatched_never_suggests_a_fake_best_match(self):
+        # Regression test: an illegible spine (empty title AND author) scores exactly 0.0 against
+        # every catalog row. Python's stable sort then preserves catalog order among that tie, so
+        # whichever row has the lowest id silently "won" and was shown to the user as if it were a
+        # real suggestion -- found via a real device test where nearly every unreadable spine came
+        # back labeled "Dune" (catalog id 1). 'unmatched' must mean no usable suggestion at all.
+        result = match_book('', '', self.catalog)
+        self.assertEqual(result['status'], 'unmatched')
+        self.assertIsNone(result['best_match'])
+        self.assertEqual(result['candidates'], [])
+
 
 class MatchingAgainstRealCatalogTests(TestCase):
     """Integration tests against the actual catalog.csv shipped in the repo, exercising the
