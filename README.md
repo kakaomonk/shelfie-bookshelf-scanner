@@ -61,28 +61,46 @@ simulator (simulators can usually also reach `localhost` directly, but the LAN I
 
 ## Architecture
 
+```mermaid
+flowchart LR
+    subgraph Client["📱 Expo app (React Native)"]
+        A["Take / pick a photo"]
+        H["Review screen<br/>confirm · edit · discard"]
+        L["Library list"]
+    end
+
+    subgraph Backend["Django REST API"]
+        B["POST /api/scan"]
+        E["rapidfuzz matching<br/>vs catalog.csv (114 entries)"]
+        F{"confidence"}
+        G["POST /api/library<br/>(auto-add or confirm)"]
+        DB[("SQLite<br/>LibraryEntry")]
+    end
+
+    subgraph Local["Local · CPU · off-the-shelf, no training"]
+        C["FastSAM<br/>segment individual spines"]
+    end
+
+    subgraph Hosted["Hosted · Anthropic API"]
+        D["Claude Haiku<br/>1 batched call reads every crop"]
+    end
+
+    A -->|multipart photo| B
+    B --> C
+    C -->|spine crops| D
+    D -->|title / author per spine| E
+    E --> F
+    F -->|high confidence| G --> DB
+    F -->|low confidence / unmatched| H
+    H -->|confirm| G
+    H -->|discard| X["not persisted"]
+    DB --> L
 ```
-Expo app --photo--> Django /api/scan/
-                         |
-                         v
-              FastSAM (local, CPU)        <- finds individual spine bounding boxes
-                         |
-                         v
-         Claude Haiku (hosted, 1 batched call)  <- reads title/author off every crop at once
-                         |
-                         v
-              rapidfuzz matching          <- scores each read against catalog.csv, confidence 0-1
-                         |
-              +----------+----------+
-              |                     |
-       high confidence        low confidence / unmatched
-       auto-add (POST             surfaced to the review screen
-       /api/library/)             (confirm / edit / discard)
-              |                     |
-              +----------+----------+
-                         v
-              SQLite (LibraryEntry)  <- only what a human actually confirmed
-```
+
+Solid arrows are the request/response path for a single scan; the diagram's real point is the
+**Local** vs. **Hosted** split -- geometry stays on the machine, reading text is the only step that
+leaves it, and nothing reaches `LibraryEntry` without either clearing the confidence bar or a human
+tapping Confirm.
 
 **Local vs. hosted, and why**: FastSAM (Ultralytics, off-the-shelf pretrained weights, no
 training/fine-tuning) runs locally on CPU and does pure geometry -- finding *where* spines are.
