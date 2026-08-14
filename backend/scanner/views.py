@@ -10,13 +10,64 @@ from rest_framework.response import Response
 
 from .detection import detect_spines
 from .matching import match_book
-from .models import CatalogBook
+from .models import CatalogBook, LibraryEntry
 from .vlm import read_spines
 
 
 @api_view(['GET'])
 def health(request):
     return Response({'status': 'ok'})
+
+
+def _serialize_library_entry(entry):
+    return {
+        'id': entry.id,
+        'title': entry.title,
+        'author': entry.author,
+        'catalog_id': entry.catalog_book_id,
+        'match_confidence': entry.match_confidence,
+        'added_at': entry.added_at.isoformat(),
+    }
+
+
+@api_view(['GET', 'POST'])
+def library(request):
+    """List the user's confirmed library, or confirm one book into it.
+
+    There's no separate "pending review" model: candidates from /api/scan live only in the API
+    response and the app's in-memory state while the user reviews them. Nothing is persisted
+    unless/until the user actually confirms it here -- so a LibraryEntry is always something a
+    person looked at and accepted, never something the pipeline guessed.
+    """
+    if request.method == 'GET':
+        return Response([_serialize_library_entry(e) for e in LibraryEntry.objects.all()])
+
+    title = (request.data.get('title') or '').strip()
+    author = (request.data.get('author') or '').strip()
+    if not title:
+        return Response({'error': 'title is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    catalog_book = None
+    catalog_id = request.data.get('catalog_id')
+    if catalog_id:
+        catalog_book = CatalogBook.objects.filter(id=catalog_id).first()
+
+    entry = LibraryEntry.objects.create(
+        title=title,
+        author=author,
+        catalog_book=catalog_book,
+        match_confidence=request.data.get('match_confidence'),
+    )
+    return Response(_serialize_library_entry(entry), status=status.HTTP_201_CREATED)
+
+
+@api_view(['DELETE'])
+def library_detail(request, pk):
+    entry = LibraryEntry.objects.filter(pk=pk).first()
+    if entry is None:
+        return Response({'error': 'Library entry not found.'}, status=status.HTTP_404_NOT_FOUND)
+    entry.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def _serialize_candidate(candidate):
