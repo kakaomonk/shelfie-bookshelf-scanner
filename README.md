@@ -167,6 +167,17 @@ All 7 legible reads correctly landed as `unmatched` rather than false-matching t
 happen: the matcher didn't force a confident-looking wrong answer just because *something* scored
 highest.
 
+A second round of real-device testing (an actual bookshelf, plus a shelf of board games as a
+stress case) confirmed the pattern: FastSAM doesn't know what a book is, so a board game box or
+a product box gets detected exactly like a spine would. But it turns out that's fine end to end --
+the VLM doesn't know what a book is either, and faithfully reads whatever text is actually printed
+on the box (a board game's title, a product name), which is the correct behavior for a model whose
+job is "read the text in this crop," not "judge whether this is a book." Since board games and
+products aren't in the catalog, these reads land as `unmatched` and get discarded in one tap, same
+as the massage gun above. The one real bug this round of testing did surface -- illegible spines
+all resolving to a fake "Dune" suggestion -- was a matching-logic bug, not a detection/VLM problem;
+see `backend/scanner/matching.py`'s `test_unmatched_never_suggests_a_fake_best_match` for the fix.
+
 The VLM row is the one number this README can't honestly fill in yet: a working `ANTHROPIC_API_KEY`
 wasn't available at the time of the last update. `scripts/measure_pipeline.py` already computes
 and prints exactly these numbers (elapsed time, input/output tokens, estimated cost) the moment a
@@ -239,12 +250,16 @@ point, bibliographic precision isn't.
 
 ## What's unfinished
 
-- **Detection false-positives on furniture.** FastSAM also flags tall/narrow non-book shapes (an
-  open drawer gap, a shelf divider) as candidates -- geometrically they're just as tall-and-narrow
-  as a spine. Threshold tuning against a real photo (`test_photos/shelf_1.jpg`) cut the most
-  obvious cases, but didn't eliminate the problem. What survives almost always fails to match
-  anything in the catalog and lands in the review queue for a one-tap discard, so it degrades the
-  review experience rather than the data quality -- but with more time, a cheap next step would be
+- **Detection false-positives on anything tall and narrow, not just books.** FastSAM has no
+  concept of "book" -- an open drawer gap, a shelf divider, a board game box, or a product box all
+  get detected exactly like a spine would, confirmed on two different real shelves (one with
+  furniture gaps, one with board games). Threshold tuning against a real photo
+  (`test_photos/shelf_1.jpg`) cut the most obvious cases, but didn't eliminate the problem. And the
+  VLM doesn't second-guess it either -- it faithfully reads whatever text is actually printed on a
+  non-book box, which is correct given its job is "read the text in this crop," not "judge whether
+  this is a book." Since none of that shows up in the catalog, it lands as `unmatched` and gets
+  discarded in one tap -- it degrades the review experience (more items to dismiss), not the data
+  quality (nothing wrong ever reaches the library). With more time, a cheap next step would be
   constraining candidates to a detected shelf-surface band instead of the whole frame.
 - **VLM numbers were measured through an OpenRouter passthrough, not `api.anthropic.com`
   directly** (see "Measured latency & cost" above) -- a direct Anthropic key wasn't available yet
