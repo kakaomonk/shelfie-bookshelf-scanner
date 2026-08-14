@@ -23,12 +23,19 @@ _MODEL_LOCK = threading.Lock()
 _model = None
 
 IMG_SIZE = 1024
-CONF_THRESHOLD = 0.35
+CONF_THRESHOLD = 0.45
 INTERNAL_IOU = 0.9  # FastSAM's own NMS during inference; kept permissive, we NMS again ourselves
 
-MIN_ASPECT_RATIO = 1.2  # height / width -- spines stand taller than they are wide
+MIN_ASPECT_RATIO = 1.4  # height / width -- spines stand taller than they are wide
 MIN_AREA_FRAC = 0.004  # drop slivers/noise
-MAX_AREA_FRAC = 0.35  # drop whole-shelf/background blobs
+MAX_AREA_FRAC = 0.22  # drop whole-shelf/background blobs
+
+# Tuned against a real cluttered shelf photo, not just clean synthetic spines. These thresholds
+# cut roughly a third of false positives (open drawer gaps, a shelf divider, a wire basket) without
+# losing any real book/box spine -- but they don't eliminate false positives entirely, since a
+# furniture gap can be just as tall-and-narrow as a spine. What survives isn't trusted blindly:
+# it still has to pass VLM reading and catalog matching, and almost always ends up unmatched in
+# the review queue where a human discards it in one tap. See README "What's unfinished."
 NMS_IOU_THRESHOLD = 0.5
 CROP_PADDING_FRAC = 0.04  # small margin so OCR/VLM isn't reading right up to a hard mask edge
 
