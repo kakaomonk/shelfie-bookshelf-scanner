@@ -121,6 +121,13 @@ for an auto-added high-confidence match itself fails, that book falls back to re
 normal manual-review card instead of silently disappearing. See `backend/scanner/views.py` and
 `backend/scanner/vlm.py`.
 
+## Screenshots
+
+_Pending a real device test with a live API key -- no iOS Simulator/Android emulator was available
+in the environment this was built in to generate these from a mobile browser/renderer, and a
+web-rendered React Native screenshot wouldn't represent the real app anyway. Will be added here
+(scan screen, review queue, library list) before submission._
+
 ## Measured latency & cost
 
 Measured with `scripts/measure_pipeline.py` against `test_photos/shelf_1.jpg` (a real,
