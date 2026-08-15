@@ -279,6 +279,21 @@ point, bibliographic precision isn't.
   directly** (see "Measured latency & cost" above) -- a direct Anthropic key wasn't available yet
   when this was measured. Same model, same token accounting, likely marginally lower latency on
   the direct path; will re-measure directly if a key arrives before submission.
+- **Tilted/leaning spines detect and read worse than upright ones.** `detect_spines` uses each
+  FastSAM mask's *axis-aligned* bounding box (`result.boxes.xyxy`), not the actual segmentation
+  polygon (`result.masks.xy`) FastSAM already returns. A book leaning at an angle has an
+  axis-aligned box that's wider than the book itself (it has to contain the full tilted extent),
+  which both skews `MIN_ASPECT_RATIO` away from a real spine's proportions and hands the VLM a
+  noisier crop that bleeds into neighboring spines. The obvious fix -- score candidates by the
+  *oriented* bounding box of the mask polygon (via `cv2.minAreaRect`) instead -- was investigated
+  and rejected: on the real test photo, several of FastSAM's noisier masks (shelf edges, a crack,
+  a reflection) are thin diagonal point clusters inside a wide, flat axis-aligned box. Their
+  *oriented* aspect ratio looks exactly like a real tilted spine, so switching wholesale to
+  oriented boxes would trade "misses some tilted books" for "admits more non-book diagonal noise,"
+  not a clean win. A real fix needs an added regularity check on the polygon shape (e.g. how well
+  it fills its own oriented box) to tell "a real tilted rectangle" apart from "a thin diagonal
+  sliver of noise" -- judged too large a change to make safely this close to the deadline rather
+  than something structurally impossible.
 - **No re-matching after a manual correction** in the review screen, as noted above.
 - **The 30-spines-per-call cap isn't chunked into follow-up calls** for denser shelves -- it's
   surfaced as a warning instead, which is honest but not a full solution.
