@@ -138,6 +138,14 @@ for an auto-added high-confidence match itself fails, that book falls back to re
 normal manual-review card instead of silently disappearing. See `backend/scanner/views.py` and
 `backend/scanner/vlm.py`.
 
+Photos also arrive in more than one format than expected: a real device test surfaced a case where
+"Choose from Library" on iOS handed the backend a HEIC file (iOS's default photo library format)
+instead of JPEG -- unlike the camera path, `expo-image-picker` doesn't convert this one. Pillow
+can't decode HEIC on its own, so this used to be a 400 with a real bug behind the friendly error
+message. Fixed by registering `pillow-heif` as a Pillow codec plugin at import time
+(`scanner/views.py`) rather than trying to force a specific format client-side -- the upload path
+doesn't need to know or care which format it got.
+
 ## Screenshots
 
 _Pending a real device test with a live API key -- no iOS Simulator/Android emulator was available
@@ -274,8 +282,5 @@ point, bibliographic precision isn't.
 - **No re-matching after a manual correction** in the review screen, as noted above.
 - **The 30-spines-per-call cap isn't chunked into follow-up calls** for denser shelves -- it's
   surfaced as a warning instead, which is honest but not a full solution.
-- **HEIC photos aren't decoded server-side** (Pillow doesn't support HEIC without an extra
-  dependency that wasn't worth adding) -- not an issue through the app itself, since Expo's image
-  picker re-encodes to JPEG before upload; only matters for a photo supplied directly as a file.
 - With another day: chunk the VLM call for larger shelves, constrain detection to a shelf-surface
   region, and re-run the matcher after manual edits in the review screen.

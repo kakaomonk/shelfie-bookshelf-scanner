@@ -2,6 +2,7 @@ import time
 import uuid
 from pathlib import Path
 
+import pillow_heif
 from django.conf import settings
 from PIL import Image, ImageOps, UnidentifiedImageError
 from rest_framework import status
@@ -12,6 +13,13 @@ from .detection import detect_spines
 from .matching import match_book
 from .models import CatalogBook, LibraryEntry
 from .vlm import SpineRead, read_spines
+
+# iOS's photo library stores photos as HEIC by default, and expo-image-picker's
+# launchImageLibraryAsync passes that format straight through (unlike the camera path, which
+# produces JPEG) -- Pillow can't decode HEIC on its own. Registering this opener once at import
+# time makes Image.open() transparently handle .heic/.heif alongside every format it already
+# supports, so the upload path doesn't need to know or care which one it got.
+pillow_heif.register_heif_opener()
 
 
 @api_view(['GET'])
