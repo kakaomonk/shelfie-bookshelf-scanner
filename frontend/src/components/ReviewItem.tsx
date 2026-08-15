@@ -15,7 +15,13 @@ export default function ReviewItem({ book }: { book: ScannedBook }) {
   const [status, setStatus] = useState<LocalStatus>('pending');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const alternatives = book.match.candidates.filter((c) => c.catalog_id !== suggestion?.catalog_id);
+  // Exclude candidates that are indistinguishable from the current suggestion (a different
+  // edition of the same book, not a different book) -- offering "Did you mean: The Hobbit" when
+  // the title field already reads "The Hobbit" looks like a no-op tap, since matching.py already
+  // treats these as the same answer rather than a real choice (see its ambiguous_tie logic).
+  const alternatives = book.match.candidates.filter(
+    (c) => c.catalog_id !== suggestion?.catalog_id && (c.title !== title || c.author !== author)
+  );
 
   function applyEdit(field: 'title' | 'author', value: string) {
     // Once the user edits away from the suggested match, it's no longer that catalog entry --
