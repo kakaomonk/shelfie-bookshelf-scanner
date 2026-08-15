@@ -20,7 +20,7 @@ AI tools were used to build it.
 ## Setup
 
 Requires Python 3.10–3.12 (tested with 3.12; on Apple Silicon use a native arm64 interpreter --
-Rosetta/x86_64 Python caps out on an old `torch` build and is noticeably slower) and Node 18+.
+Rosetta/x86_64 Python caps out on an old `torch` build and is noticeably slower) and Node 20.19.4+.
 
 ### Backend
 
@@ -42,8 +42,14 @@ Run the tests with `venv/bin/python manage.py test scanner`.
 
 ### Frontend
 
-Needs Node 18+ (Expo SDK 57 requires it; check with `node --version` -- if it's older, install a
-current LTS with [nvm](https://github.com/nvm-sh/nvm) rather than fighting the system Node).
+Needs Node 20.19.4+ (React Native 0.81, which Expo SDK 54 pins, declares this in its `engines`;
+check with `node --version` -- if it's older, install a current LTS with
+[nvm](https://github.com/nvm-sh/nvm) rather than fighting the system Node).
+
+This app targets **Expo SDK 54** deliberately: the App Store / Play Store build of Expo Go only
+supports SDK 54, and newer SDKs require a custom EAS-built client tied to a paid Apple Developer
+account. Staying on 54 means it runs in the stock Expo Go app on any phone -- worth knowing before
+upgrading anything here.
 
 ```bash
 cd frontend
