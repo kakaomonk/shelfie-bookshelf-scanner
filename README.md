@@ -149,17 +149,17 @@ doesn't need to know or care which format it got.
 ## Screenshots
 
 From a real device test on an actual (dense, 58-spine) bookshelf -- not a staged shot. The source
-photo is committed as `test_photos/shelf_2.jpg`.
+photo is committed as `test_photos/shelf_1.jpg`.
 
 | | |
 |---|---|
 | <img src="screenshots/1_main.png" width="280" /><br>Scan screen | <img src="screenshots/2_scan.jpg" width="280" /><br>Scanning a real shelf |
 | <img src="screenshots/3_before_discard.jpg" width="280" /><br>Review queue -- 44 need review, 14 dropped over the per-scan cap (real photo, real warning, not staged) | <img src="screenshots/4_after_discard.jpg" width="280" /><br>After discarding an unreadable spine; the next card shows a correctly matched title/author |
-| <img src="screenshots/5_before_remove.png" width="280" /><br>Library after confirming a few books -- including "MONOPOLY," since the pipeline detects and reads any box-shaped object, not just books (see "Known limitations") | <img src="screenshots/6_after_remove.png" width="280" /><br>After removing it from the library |
+| <img src="screenshots/5_before_remove.png" width="280" /><br>Library after confirming a few books -- including "MONOPOLY," since the pipeline detects and reads any box-shaped object, not just books (from `test_photos/shelf_3.jpg`, a shelf of board games -- see "Known limitations") | <img src="screenshots/6_after_remove.png" width="280" /><br>After removing it from the library |
 
 ## Measured latency & cost
 
-Measured with `scripts/measure_pipeline.py` against `test_photos/shelf_1.jpg` (a real,
+Measured with `scripts/measure_pipeline.py` against `test_photos/shelf_2.jpg` (a real,
 cluttered shelf photo, 3024×4032, 22 detected spine candidates) on an Apple Silicon Mac, CPU only.
 
 | Stage | Time | Notes |
@@ -196,13 +196,10 @@ as the massage gun above. The one real bug this round of testing did surface -- 
 all resolving to a fake "Dune" suggestion -- was a matching-logic bug, not a detection/VLM problem;
 see `backend/scanner/matching.py`'s `test_unmatched_never_suggests_a_fake_best_match` for the fix.
 
-The VLM row is the one number this README can't honestly fill in yet: a working `ANTHROPIC_API_KEY`
-wasn't available at the time of the last update. `scripts/measure_pipeline.py` already computes
-and prints exactly these numbers (elapsed time, input/output tokens, estimated cost) the moment a
-key is in place -- `cd backend && venv/bin/python ../scripts/measure_pipeline.py ../test_photos/shelf_1.jpg`.
-This is a documented gap, not a guessed number standing in for one.
+Reproduce these numbers with `cd backend && venv/bin/python ../scripts/measure_pipeline.py
+../test_photos/shelf_2.jpg`.
 
-Detection latency is the more interesting local-vs-hosted number regardless: at ~4-7s on CPU for
+Detection latency is the more interesting local-vs-hosted number regardless: at ~2-6s on CPU for
 a single photo, it's well within "wait for it while looking at your phone" territory, and it's
 free per-request since the model is loaded once per process, not per photo.
 
@@ -270,9 +267,10 @@ point, bibliographic precision isn't.
 
 - **Detection false-positives on anything tall and narrow, not just books.** FastSAM has no
   concept of "book" -- an open drawer gap, a shelf divider, a board game box, or a product box all
-  get detected exactly like a spine would, confirmed on two different real shelves (one with
-  furniture gaps, one with board games). Threshold tuning against a real photo
-  (`test_photos/shelf_1.jpg`) cut the most obvious cases, but didn't eliminate the problem. And the
+  get detected exactly like a spine would, confirmed on two different real shelves (`shelf_2.jpg`,
+  with furniture gaps, and `shelf_3.jpg`, a shelf of board games -- the source of the "MONOPOLY"
+  library entry in the screenshots above). Threshold tuning against `test_photos/shelf_2.jpg`
+  cut the most obvious cases, but didn't eliminate the problem. And the
   VLM doesn't second-guess it either -- it faithfully reads whatever text is actually printed on a
   non-book box, which is correct given its job is "read the text in this crop," not "judge whether
   this is a book." Since none of that shows up in the catalog, it lands as `unmatched` and gets
