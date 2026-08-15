@@ -109,6 +109,22 @@ class MatchingAgainstRealCatalogTests(TestCase):
         result = match_book('The Two Towers', 'J.R.R. Tolkien', CatalogBook.objects.all())
         self.assertEqual(result['best_match'].title, 'The Two Towers')
 
+    def test_spine_showing_only_the_main_title_matches_a_subtitled_catalog_entry(self):
+        # Real spines usually print "Sapiens", not "Sapiens: A Brief History of Humankind".
+        # The length penalty that stops substring false-positives would otherwise (correctly, by
+        # its own logic) tank this legitimate match down to unmatched.
+        result = match_book('Sapiens', 'Yuval Noah Harari', CatalogBook.objects.all())
+        self.assertEqual(result['status'], 'matched')
+        self.assertEqual(result['best_match'].title, 'Sapiens: A Brief History of Humankind')
+
+    def test_main_title_shortcut_does_not_break_substring_protection(self):
+        # The pre-colon variant above must not become a backdoor for the substring cases: these
+        # titles have no colon, so they should be entirely unaffected by it.
+        foundation = match_book('Foundation', 'Isaac Asimov', CatalogBook.objects.all())
+        self.assertEqual(foundation['best_match'].title, 'Foundation')
+        it = match_book('It', 'Stephen King', CatalogBook.objects.all())
+        self.assertEqual(it['best_match'].title, 'It')
+
     def test_two_editions_of_the_same_book_both_score_as_a_confident_match(self):
         # Dune has two catalog rows (1965 Chilton / 2019 Ace). A spine read can't tell which
         # printing it is, so either should count as a confident match on title+author alone.

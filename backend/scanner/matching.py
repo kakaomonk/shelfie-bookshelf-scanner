@@ -70,6 +70,12 @@ def title_score(read_title: str, catalog_title: str, alt_titles: str = '') -> fl
     if not a:
         return 0.0
     candidates = [catalog_title] + [t for t in (alt_titles or '').split(';') if t.strip()]
+    # A spine usually prints the main title only, not the subtitle -- "Sapiens", not
+    # "Sapiens: A Brief History of Humankind". Without the pre-colon form as its own candidate,
+    # the length penalty below (correctly) tanks that read, and a legitimately correct match
+    # scores as unmatched. Cheap and general: works for subtitled books the catalog never
+    # anticipated, not just the ones with a hand-written alt_titles entry.
+    candidates += [c.split(':', 1)[0] for c in list(candidates) if ':' in c]
     best = 0.0
     for cand in candidates:
         b = _normalize(cand)
