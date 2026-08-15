@@ -148,10 +148,13 @@ doesn't need to know or care which format it got.
 
 ## Screenshots
 
-_Pending a real device test with a live API key -- no iOS Simulator/Android emulator was available
-in the environment this was built in to generate these from a mobile browser/renderer, and a
-web-rendered React Native screenshot wouldn't represent the real app anyway. Will be added here
-(scan screen, review queue, library list) before submission._
+From a real device test on an actual (dense, 58-spine) bookshelf -- not a staged shot.
+
+| | |
+|---|---|
+| <img src="screenshots/1_main.png" width="280" /><br>Scan screen | <img src="screenshots/2_scan.jpg" width="280" /><br>Scanning a real shelf |
+| <img src="screenshots/3_before_discard.jpg" width="280" /><br>Review queue -- 44 need review, 14 dropped over the per-scan cap (real photo, real warning, not staged) | <img src="screenshots/4_after_discard.jpg" width="280" /><br>After discarding an unreadable spine; the next card shows a correctly matched title/author |
+| <img src="screenshots/5_before_remove.png" width="280" /><br>Library after confirming a few books -- including "MONOPOLY," since the pipeline detects and reads any box-shaped object, not just books (see "Known limitations") | <img src="screenshots/6_after_remove.png" width="280" /><br>After removing it from the library |
 
 ## Measured latency & cost
 

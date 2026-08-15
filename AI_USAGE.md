@@ -29,7 +29,11 @@ and then reviewed/approved each subsequent step rather than writing files direct
   supplied a real bookshelf photo (`test_photos/shelf_1.jpg`), it surfaced false positives
   (furniture, shelf dividers) the synthetic test never would have -- the thresholds were retuned
   against that real photo, and the residual limitation was written up honestly rather than
-  hidden (see README "What's unfinished").
+  hidden (see README "What's unfinished"). Similarly, the frontend was originally scaffolded on
+  Expo SDK 57; it passed every local check (typecheck, bundle export) but failed to open in the
+  store-distributed Expo Go app on the author's actual phone, since that app only supports SDK 54
+  as of this writing. Downgraded once that real-device failure surfaced it -- a category of
+  problem no amount of local tooling would have caught.
 - **Human judgment calls**: which hosted VLM provider to use and whose API key to spend (the
   author's own), when to stop iterating and ship a given piece, and reviewing every diff before
   it was committed.
@@ -40,6 +44,25 @@ and then reviewed/approved each subsequent step rather than writing files direct
   on the several publisher names that contain commas. Not independently fact-checked entry by
   entry (dates/publishers are approximate) -- the messiness is deliberate, the bibliographic
   precision is not the point.
+- **Real-device testing found real bugs code review didn't.** Once the author had the app running
+  on their own phone against their own bookshelves, three genuine bugs surfaced that no amount of
+  synthetic testing had caught: illegible spine reads were silently suggesting a fake "Dune" match
+  (a stable-sort artifact in `matching.py` -- an all-zero score tie defaulted to the lowest catalog
+  id), spines showing only a book's main title (no subtitle) were scoring as unmatched even with a
+  correct read, and choosing a photo from the iOS photo library (HEIC format) failed to decode
+  server-side entirely. All three were diagnosed and fixed in the same session, each with a
+  regression test or an explicit before/after verification against the real photo/device that
+  found it -- see the commit history for `matching.py` and `scanner/views.py` around this period.
+  This is the part of the process most worth being honest about: the assistant's own synthetic
+  tests and code review gave false confidence here, and it took the author actually using the app
+  to surface what was really broken.
+- **An investigated-and-rejected fix.** A real limitation (detection performing worse on
+  tilted/leaning spines) had an "obvious" fix -- score FastSAM's oriented mask polygon instead of
+  its axis-aligned box. The assistant tested this against the real test photo before proposing it,
+  found it would trade one failure mode (missed tilted books) for a worse one (more non-book
+  diagonal noise passing the filter), and reported that back rather than implementing it or
+  quietly dropping the idea. Documented as a known limitation with the actual reasoning, not just
+  "not done."
 
 ## What AI did not do
 
