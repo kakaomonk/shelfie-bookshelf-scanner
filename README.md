@@ -148,7 +148,8 @@ doesn't need to know or care which format it got.
 
 ## Screenshots
 
-From a real device test on an actual (dense, 58-spine) bookshelf -- not a staged shot.
+From a real device test on an actual (dense, 58-spine) bookshelf -- not a staged shot. The source
+photo is committed as `test_photos/shelf_2.jpg`.
 
 | | |
 |---|---|
